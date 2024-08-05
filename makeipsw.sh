@@ -117,7 +117,7 @@ for identity in $(eval echo {0..$(expr $(plutil -extract BuildIdentities raw -ex
 	esac
 
 	if [ -f "${ipsw_restoreramdisk}.rdsk-done" ]; then continue; fi
-    ../../Darwin/img4 -i $ipsw_restoreramdisk -o decrypted.dmg
+    	../../Darwin/img4 -i $ipsw_restoreramdisk -o decrypted.dmg
 
 	restoreramdisk_mount_path=$(hdiutil attach decrypted.dmg -owners on | awk 'END {print $NF}' | tr -d '\n')
 	sudo mount -urw "$restoreramdisk_mount_path"
@@ -129,11 +129,11 @@ for identity in $(eval echo {0..$(expr $(plutil -extract BuildIdentities raw -ex
 	sudo chmod 755 "$restoreramdisk_mount_path"/usr/local/bin/restored${restored_suffix} "$restoreramdisk_mount_path"/usr/sbin/asr
 
 	ipsw_restoretrustcache=$(plutil -extract "BuildIdentities".${identity}."Manifest"."RestoreTrustCache"."Info"."Path" raw -expect string -o - BuildManifest.plist)
-    ../../Darwin/trustcache create -v 1 ${ipsw_restoretrustcache}.dec "$restoreramdisk_mount_path"
+    	../../Darwin/trustcache create -v 1 ${ipsw_restoretrustcache}.dec "$restoreramdisk_mount_path"
 	hdiutil detach "${restoreramdisk_mount_path}"
 
-    ../../Darwin/img4 -i decrypted.dmg -o $ipsw_restoreramdisk -A -T rdsk
-    ../../Darwin/img4 -i ${ipsw_restoretrustcache}.dec -o ${ipsw_restoretrustcache} -A -T rtsc
+    	../../Darwin/img4 -i decrypted.dmg -o $ipsw_restoreramdisk -A -T rdsk
+    	../../Darwin/img4 -i ${ipsw_restoretrustcache}.dec -o ${ipsw_restoretrustcache} -A -T rtsc
 	rm -f ${ipsw_restoretrustcache}.dec decrypted.dmg
 	touch "${ipsw_restoreramdisk}.rdsk-done"
 done
