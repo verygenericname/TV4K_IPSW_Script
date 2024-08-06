@@ -2,35 +2,34 @@
 # This is a script to make a ipsw for the apple tv 4k, many thanks to the 14.8.1 script
 
 if [ -z "$1" ] & [ -z "$2" ]; then
-    echo "Usage: pathtoota linktotv4ipsw" && exit 1
+    echo "Usage: pathorlinktoota linkorpathtotv4ipsw" && exit 1
 fi
 
 set -e
-#set -o xtrace
 
 mkdir -p ipsws
 sudo rm -rf work | true
 sudo rm /tmp/BI0.plist | true
-#if [ -z "$VOLUME_NAME" ]; then
-	VOLUME_NAME=TV_RESTORE_OTA
-#fi
+VOLUME_NAME=TV_RESTORE_OTA
 
-# aria2c args
-#if [ -z "$3" ]; then
-#    aria2c_args="-j32 -x32 -s32"
-#else
-#    aria2c_args="-j$3 -x$3 -s$3"
-#fi
-
-# download the ota
-#aria2c $aria2c_args "$1" -o "ota-$2.zip"
+if [ ! -e $1 ]; then
+mkdir downloads
+rm downloads/* | true
+cd downloads
+wget $1
+cd ..
+fi
 
 # create work dir
 mkdir -p work/ota work/ipsw
 
 # unzip ota
 cd work/ota
+if [ ! -e $1 ]; then
+unzip ../../downloads/*
+else
 unzip $1
+fi
 
 mkdir AssetData/rootfs
 cd AssetData/rootfs
@@ -59,7 +58,7 @@ sudo hdiutil attach output.dmg -owners on
 sudo mount -urw /Volumes/Template
 sudo rsync -a rootfs/ /Volumes/Template/
 sudo diskutil rename /Volumes/Template $VOLUME_NAME
-hdiutil detach /Volumes/$VOLUME_NAME
+hdiutil detach /Volumes/$VOLUME_NAME -force
 hdiutil convert -format ULFO -o converted.dmg output.dmg
 asr imagescan --source converted.dmg
 cd ../..
@@ -89,6 +88,7 @@ ipsw_rootfs=$(plutil -extract "BuildIdentities".0."Manifest"."OS"."Info"."Path" 
 
 mv ../ota/AssetData/converted.dmg $ipsw_rootfs
 cd ..
+if [ ! -e $2 ]; then
 ../Darwin/pzb -g BuildManifest.plist $2
 tv4_restoreramdisk=$(plutil -extract "BuildIdentities".0."Manifest"."RestoreRamDisk"."Info"."Path" raw -expect string -o - BuildManifest.plist)
 tv4_updateramdisk=$(plutil -extract "BuildIdentities".1."Manifest"."RestoreRamDisk"."Info"."Path" raw -expect string -o - BuildManifest.plist)
@@ -98,6 +98,17 @@ rm BuildManifest.plist
 mv $tv4_restoreramdisk ipsw/arm64SURamDisk.dmg
 mv $tv4_updateramdisk ipsw/arm64SURamDisk2.dmg
 cd ipsw
+else
+unzip $2 BuildManifest.plist
+tv4_restoreramdisk=$(plutil -extract "BuildIdentities".0."Manifest"."RestoreRamDisk"."Info"."Path" raw -expect string -o - BuildManifest.plist)
+tv4_updateramdisk=$(plutil -extract "BuildIdentities".1."Manifest"."RestoreRamDisk"."Info"."Path" raw -expect string -o - BuildManifest.plist)
+rm BuildManifest.plist
+unzip $2 $tv4_restoreramdisk
+unzip $2 $tv4_updateramdisk
+mv $tv4_restoreramdisk ipsw/arm64SURamDisk.dmg
+mv $tv4_updateramdisk ipsw/arm64SURamDisk2.dmg
+cd ipsw
+fi
 
 # Patch the Restore/Update ramdisk
 for identity in $(eval echo {0..$(expr $(plutil -extract BuildIdentities raw -expect array -o - BuildManifest.plist) - 1)}); do
@@ -130,7 +141,7 @@ for identity in $(eval echo {0..$(expr $(plutil -extract BuildIdentities raw -ex
 
 	ipsw_restoretrustcache=$(plutil -extract "BuildIdentities".${identity}."Manifest"."RestoreTrustCache"."Info"."Path" raw -expect string -o - BuildManifest.plist)
     	../../Darwin/trustcache create -v 1 ${ipsw_restoretrustcache}.dec "$restoreramdisk_mount_path"
-	hdiutil detach "${restoreramdisk_mount_path}"
+	hdiutil detach "${restoreramdisk_mount_path}" -force
 
     	../../Darwin/img4 -i decrypted.dmg -o $ipsw_restoreramdisk -A -T rdsk
     	../../Darwin/img4 -i ${ipsw_restoretrustcache}.dec -o ${ipsw_restoretrustcache} -A -T rtsc
