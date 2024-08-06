@@ -59,7 +59,9 @@ sudo mount -urw /Volumes/Template
 sudo rsync -a rootfs/ /Volumes/Template/
 sudo diskutil rename /Volumes/Template $VOLUME_NAME
 hdiutil detach /Volumes/$VOLUME_NAME -force
+hdiutil resize -sectors min output.dmg
 hdiutil convert -format ULFO -o converted.dmg output.dmg
+rm output.dmg
 asr imagescan --source converted.dmg
 cd ../..
 
