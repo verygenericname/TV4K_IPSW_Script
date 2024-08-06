@@ -9,12 +9,12 @@ set -e
 
 mkdir -p ipsws
 sudo rm -rf work | true
-sudo rm /tmp/BI0.plist | true
+sudo rm -f /tmp/BI0.plist | true
 VOLUME_NAME=TV_RESTORE_OTA
 
 if [ ! -e $1 ]; then
+rm -rf downloads | true
 mkdir downloads
-rm downloads/* | true
 cd downloads
 wget $1
 cd ..
@@ -77,7 +77,7 @@ cp ../ota/AssetData/boot/BuildManifest.plist .
 /usr/libexec/PlistBuddy -x -c "Print :BuildIdentities:0" BuildManifest.plist > /tmp/BI0.plist
 /usr/libexec/PlistBuddy -c "Add :BuildIdentities:1 dict" BuildManifest.plist
 /usr/libexec/PlistBuddy -x -c "Merge /tmp/BI0.plist :BuildIdentities:1" BuildManifest.plist
-sudo rm /tmp/BI0.plist
+sudo rm -f /tmp/BI0.plist
 
 /usr/libexec/PlistBuddy -c "Set :BuildIdentities:1:Info:RestoreBehavior Update" BuildManifest.plist
 /usr/libexec/PlistBuddy -c "Set :BuildIdentities:1:Info:Variant Customer Upgrade Install (IPSW)" BuildManifest.plist
@@ -92,7 +92,7 @@ if [ ! -e $2 ]; then
 ../Darwin/pzb -g BuildManifest.plist $2
 tv4_restoreramdisk=$(plutil -extract "BuildIdentities".0."Manifest"."RestoreRamDisk"."Info"."Path" raw -expect string -o - BuildManifest.plist)
 tv4_updateramdisk=$(plutil -extract "BuildIdentities".1."Manifest"."RestoreRamDisk"."Info"."Path" raw -expect string -o - BuildManifest.plist)
-rm BuildManifest.plist
+rm -f BuildManifest.plist
 ../Darwin/pzb -g $tv4_restoreramdisk $2
 ../Darwin/pzb -g $tv4_updateramdisk $2
 mv $tv4_restoreramdisk ipsw/arm64SURamDisk.dmg
@@ -102,7 +102,7 @@ else
 unzip $2 BuildManifest.plist
 tv4_restoreramdisk=$(plutil -extract "BuildIdentities".0."Manifest"."RestoreRamDisk"."Info"."Path" raw -expect string -o - BuildManifest.plist)
 tv4_updateramdisk=$(plutil -extract "BuildIdentities".1."Manifest"."RestoreRamDisk"."Info"."Path" raw -expect string -o - BuildManifest.plist)
-rm BuildManifest.plist
+rm -f BuildManifest.plist
 unzip $2 $tv4_restoreramdisk
 unzip $2 $tv4_updateramdisk
 mv $tv4_restoreramdisk ipsw/arm64SURamDisk.dmg
@@ -153,7 +153,7 @@ rm -f *".rdsk-done"
 # make the ipsw
 ipsw_buildnumber=$(plutil -extract "ProductBuildVersion" raw -expect string -o - BuildManifest.plist)
 ipsw_version=$(plutil -extract "ProductVersion" raw -expect string -o - BuildManifest.plist)
-rm ../../ipsws/AppleTV6,2_"$ipsw_version"_"$ipsw_buildnumber"_Restore.ipsw | true
+rm -f ../../ipsws/AppleTV6,2_"$ipsw_version"_"$ipsw_buildnumber"_Restore.ipsw | true
 zip -r9 ../../ipsws/AppleTV6,2_"$ipsw_version"_"$ipsw_buildnumber"_Restore.ipsw . -x "*.DS_Store"
 cd ../../
 sudo rm -rf work | true
