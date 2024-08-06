@@ -150,6 +150,7 @@ for identity in $(eval echo {0..$(expr $(plutil -extract BuildIdentities raw -ex
 done
 
 rm -f *".rdsk-done"
+rm -rf ../ota # clear space, no longer needed
 # make the ipsw
 ipsw_buildnumber=$(plutil -extract "ProductBuildVersion" raw -expect string -o - BuildManifest.plist)
 ipsw_version=$(plutil -extract "ProductVersion" raw -expect string -o - BuildManifest.plist)
