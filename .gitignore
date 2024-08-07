@@ -2,6 +2,7 @@
 Darwin/gaster
 Linux/gaster
 work
+ipsws
 sshramdisk
 .irecovery
 *.log
