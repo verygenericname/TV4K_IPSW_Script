@@ -71,6 +71,7 @@ cp ../ota/AssetData/boot/kernelcache.release.* .
 
 cp ../ota/AssetData/boot/BuildManifest.plist .
 
+chmod u+w BuildManifest.plist # seemingly only needed on 18, odd
 /usr/libexec/PlistBuddy -c "Set :BuildIdentities:0:Info:RestoreBehavior Erase" BuildManifest.plist
 /usr/libexec/PlistBuddy -c "Set :BuildIdentities:0:Info:Variant Customer Erase Install (IPSW)" BuildManifest.plist
 /usr/libexec/PlistBuddy -c "Set :BuildIdentities:0:Manifest:RestoreRamDisk:Info:Path arm64SURamDisk.dmg" BuildManifest.plist
