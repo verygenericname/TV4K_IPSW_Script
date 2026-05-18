@@ -172,6 +172,17 @@ for identity in $(eval echo {0..$(expr $(plutil -extract BuildIdentities raw -ex
 done
 
 rm -f *".rdsk-done"
+
+#if [ "$major_version" -le 17 ]; then
+#../../Darwin/img4 -i "$(awk "/""${replace}""/{x=1}x&&/iBSS[.]/{print;exit}" BuildManifest.plist | grep '<string>' |cut -d\> -f2 |cut -d\< -f1)" -o iBSS.dec
+#../../Darwin/img4 -i "$(awk "/""${replace}""/{x=1}x&&/iBEC[.]/{print;exit}" BuildManifest.plist | grep '<string>' |cut -d\> -f2 |cut -d\< -f1)" -o iBEC.dec
+#../../Darwin/iBoot64Patcher iBSS.dec iBSS.patched
+#../../Darwin/iBoot64Patcher iBEC.dec iBEC.patched
+#../../Darwin/img4 -i iBSS.patched -o "$(awk "/""${replace}""/{x=1}x&&/iBSS[.]/{print;exit}" BuildManifest.plist | grep '<string>' |cut -d\> -f2 |cut -d\< -f1 | sed 's/Firmware[/]dfu[/]//')" -A -T ibss
+#../../Darwin/img4 -i iBEC.patched -o "$(awk "/""${replace}""/{x=1}x&&/iBEC[.]/{print;exit}" BuildManifest.plist | grep '<string>' |cut -d\> -f2 |cut -d\< -f1 | sed 's/Firmware[/]dfu[/]//')" -A -T ibec
+#rm iBEC.patched iBEC.dec iBSS.patched iBSS.dec | true
+#fi
+
 sudo rm -rf ../ota # clear space, no longer needed
 # make the ipsw
 rm -f ../../ipsws/AppleTV6,2_"$ipsw_version"_"$ipsw_buildnumber"_Restore.ipsw | true
