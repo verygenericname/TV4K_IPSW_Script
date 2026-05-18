@@ -154,8 +154,8 @@ for identity in $(eval echo {0..$(expr $(plutil -extract BuildIdentities raw -ex
     if [ "$major_version" -ge 15 ]; then
         sudo ../../Darwin/restored_external64_patcher "$restoreramdisk_mount_path"/usr/local/bin/restored${restored_suffix}{,.patched}
         sudo mv "$restoreramdisk_mount_path"/usr/local/bin/restored${restored_suffix}{.patched,}
-        sudo ../../Darwin/ldid -s "$restoreramdisk_mount_path"/usr/local/bin/restored${restored_suffix}
-        sudo chmod 755 "$restoreramdisk_mount_path"/usr/local/bin/restored${restored_suffix}
+        sudo ../../Darwin/ldid -s "$restoreramdisk_mount_path"/usr/local/bin/restored${restored_suffix} "$restoreramdisk_mount_path"/usr/sbin/asr
+        sudo chmod 755 "$restoreramdisk_mount_path"/usr/local/bin/restored${restored_suffix} "$restoreramdisk_mount_path"/usr/sbin/asr
     else
         sudo ../../Darwin/ldid -s "$restoreramdisk_mount_path"/usr/sbin/asr
         sudo chmod 755 "$restoreramdisk_mount_path"/usr/sbin/asr
