@@ -84,9 +84,8 @@ chmod u+w BuildManifest.plist # seemingly only needed on 18, odd
 /usr/libexec/PlistBuddy -c "Set :BuildIdentities:0:Info:RestoreBehavior Erase" BuildManifest.plist
 /usr/libexec/PlistBuddy -c "Set :BuildIdentities:0:Info:Variant Customer Erase Install (IPSW)" BuildManifest.plist
 /usr/libexec/PlistBuddy -c "Set :BuildIdentities:0:Manifest:RestoreRamDisk:Info:Path arm64SURamDisk.dmg" BuildManifest.plist
-if [ -e "Firmware/arm64SURamDisk.dmg.trustcache" ]; then
+rm $(plutil -extract "BuildIdentities".0."Manifest"."RestoreTrustCache"."Info"."Path" raw -expect string -o - BuildManifest.plist) | true
 /usr/libexec/PlistBuddy -c "Set :BuildIdentities:0:Manifest:RestoreTrustCache:Info:Path Firmware/arm64SURamDisk.dmg.trustcache" BuildManifest.plist
-fi
 
 /usr/libexec/PlistBuddy -x -c "Print :BuildIdentities:0" BuildManifest.plist > /tmp/BI0.plist
 /usr/libexec/PlistBuddy -c "Add :BuildIdentities:1 dict" BuildManifest.plist
@@ -95,9 +94,8 @@ sudo rm -f /tmp/BI0.plist
 
 /usr/libexec/PlistBuddy -c "Set :BuildIdentities:1:Info:RestoreBehavior Update" BuildManifest.plist
 /usr/libexec/PlistBuddy -c "Set :BuildIdentities:1:Info:Variant Customer Upgrade Install (IPSW)" BuildManifest.plist
-if [ -e "Firmware/arm64SURamDisk2.dmg.trustcache" ]; then
+rm $(plutil -extract "BuildIdentities".1."Manifest"."RestoreTrustCache"."Info"."Path" raw -expect string -o - BuildManifest.plist) | true
 /usr/libexec/PlistBuddy -c "Set :BuildIdentities:1:Manifest:RestoreRamDisk:Info:Path arm64SURamDisk2.dmg" BuildManifest.plist
-fi
 /usr/libexec/PlistBuddy -c "Set :BuildIdentities:1:Manifest:RestoreTrustCache:Info:Path Firmware/arm64SURamDisk2.dmg.trustcache" BuildManifest.plist
 
 ipsw_rootfs=$(plutil -extract "BuildIdentities".0."Manifest"."OS"."Info"."Path" raw -expect string -o - BuildManifest.plist)
