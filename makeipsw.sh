@@ -62,7 +62,7 @@ sudo cp -a ../payload/replace/* .
 # make the root dmg
 cd ..
 cp ../../../template.dmg output.dmg
-hdiutil resize -size 10000m output.dmg
+hdiutil resize -size 1500m output.dmg
 sudo hdiutil attach output.dmg -owners on
 sudo mount -urw /Volumes/Template
 sudo rsync -a rootfs/ /Volumes/Template/
